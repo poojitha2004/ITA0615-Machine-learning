@@ -1,0 +1,120 @@
+import random
+import math
+
+# -----------------------------
+# Step 1: Activation Function
+# -----------------------------
+def sigmoid(x):
+    return 1 / (1 + math.exp(-x))
+
+def sigmoid_derivative(x):
+    return x * (1 - x)
+
+
+# -----------------------------
+# Step 2: Neural Network Class
+# -----------------------------
+class NeuralNetwork:
+    def __init__(self, input_neurons, hidden_neurons, output_neurons):
+        # Initialize weights randomly
+        self.w_input_hidden = [[random.uniform(-1, 1) for _ in range(hidden_neurons)]
+                               for _ in range(input_neurons)]
+        self.w_hidden_output = [[random.uniform(-1, 1) for _ in range(output_neurons)]
+                                for _ in range(hidden_neurons)]
+
+        # Biases
+        self.b_hidden = [random.uniform(-1, 1) for _ in range(hidden_neurons)]
+        self.b_output = [random.uniform(-1, 1) for _ in range(output_neurons)]
+
+    # -----------------------------
+    # Step 3: Feedforward
+    # -----------------------------
+    def feedforward(self, inputs):
+        # Hidden layer
+        self.hidden_layer = []
+        for j in range(len(self.b_hidden)):
+            activation = self.b_hidden[j]
+            for i in range(len(inputs)):
+                activation += inputs[i] * self.w_input_hidden[i][j]
+            self.hidden_layer.append(sigmoid(activation))
+
+        # Output layer
+        self.output_layer = []
+        for k in range(len(self.b_output)):
+            activation = self.b_output[k]
+            for j in range(len(self.hidden_layer)):
+                activation += self.hidden_layer[j] * self.w_hidden_output[j][k]
+            self.output_layer.append(sigmoid(activation))
+
+        return self.output_layer
+
+    # -----------------------------
+    # Step 4: Backpropagation
+    # -----------------------------
+    def backpropagate(self, inputs, expected_output, learning_rate):
+        # Calculate output error
+        output_errors = [expected_output[i] - self.output_layer[i]
+                         for i in range(len(expected_output))]
+        
+        # Output gradients
+        output_deltas = [output_errors[i] * sigmoid_derivative(self.output_layer[i])
+                         for i in range(len(output_errors))]
+
+        # Hidden layer error
+        hidden_errors = []
+        for j in range(len(self.hidden_layer)):
+            error = 0
+            for k in range(len(output_deltas)):
+                error += output_deltas[k] * self.w_hidden_output[j][k]
+            hidden_errors.append(error)
+
+        hidden_deltas = [hidden_errors[j] * sigmoid_derivative(self.hidden_layer[j])
+                         for j in range(len(hidden_errors))]
+
+        # Update weights (hidden -> output)
+        for j in range(len(self.hidden_layer)):
+            for k in range(len(output_deltas)):
+                self.w_hidden_output[j][k] += learning_rate * output_deltas[k] * self.hidden_layer[j]
+
+        # Update biases (output)
+        for k in range(len(self.b_output)):
+            self.b_output[k] += learning_rate * output_deltas[k]
+
+        # Update weights (input -> hidden)
+        for i in range(len(inputs)):
+            for j in range(len(hidden_deltas)):
+                self.w_input_hidden[i][j] += learning_rate * hidden_deltas[j] * inputs[i]
+
+        # Update biases (hidden)
+        for j in range(len(self.b_hidden)):
+            self.b_hidden[j] += learning_rate * hidden_deltas[j]
+
+
+# -----------------------------
+# Step 5: Training the Network
+# -----------------------------
+# XOR Dataset
+training_data = [
+    ([0, 0], [0]),
+    ([0, 1], [1]),
+    ([1, 0], [1]),
+    ([1, 1], [0])
+]
+
+nn = NeuralNetwork(input_neurons=2, hidden_neurons=2, output_neurons=1)
+
+epochs = 10000
+learning_rate = 0.5
+
+for epoch in range(epochs):
+    for inputs, output in training_data:
+        nn.feedforward(inputs)
+        nn.backpropagate(inputs, output, learning_rate)
+
+# -----------------------------
+# Step 6: Testing the Network
+# -----------------------------
+print("Testing ANN on XOR Dataset:")
+for inputs, expected in training_data:
+    predicted = nn.feedforward(inputs)
+    print(f"Input: {inputs} Expected: {expected} Predicted: {[round(p, 3) for p in predicted]}")
