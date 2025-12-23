@@ -1,0 +1,35 @@
+# Import required libraries
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.mixture import GaussianMixture
+
+# Create sample data (2 clusters)
+np.random.seed(42)
+X1 = np.random.normal(loc=2, scale=0.5, size=(100, 2))
+X2 = np.random.normal(loc=6, scale=0.5, size=(100, 2))
+X = np.vstack((X1, X2))
+
+# Create Gaussian Mixture Model (EM Algorithm)
+gmm = GaussianMixture(n_components=2, max_iter=100, random_state=42)
+
+# Fit the model (Expectation-Maximization)
+gmm.fit(X)
+
+# Predict cluster labels
+labels = gmm.predict(X)
+
+# Get cluster centers
+means = gmm.means_
+
+# Display results
+print("Cluster Means:")
+print(means)
+
+# Plot the clusters
+plt.scatter(X[:, 0], X[:, 1], c=labels, cmap='viridis', s=30)
+plt.scatter(means[:, 0], means[:, 1], c='red', marker='x', s=200, label='Centroids')
+plt.title("Expectation-Maximization Algorithm (GMM)")
+plt.xlabel("Feature 1")
+plt.ylabel("Feature 2")
+plt.legend()
+plt.show()
