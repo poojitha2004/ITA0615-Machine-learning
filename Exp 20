@@ -1,0 +1,55 @@
+# Import required libraries
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# ---------------- Sample Dataset ----------------
+# Features: Store_ID, Item_ID, Month, Previous_Sales, Promotion
+data = {
+    'Store_ID': [1, 1, 1, 2, 2, 2, 3, 3, 3, 4],
+    'Item_ID': [101, 102, 103, 101, 102, 103, 101, 102, 103, 101],
+    'Month': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    'Previous_Sales': [200, 150, 300, 180, 170, 290, 220, 160, 310, 210],
+    'Promotion': [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+    'Sales': [210, 160, 320, 190, 180, 300, 230, 170, 330, 220]
+}
+
+df = pd.DataFrame(data)
+
+# ---------------- Features & Target ----------------
+X = df[['Store_ID', 'Item_ID', 'Month', 'Previous_Sales', 'Promotion']]
+y = df['Sales']
+
+# ---------------- Split Dataset ----------------
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+
+# ---------------- Create Regression Model ----------------
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# ---------------- Predict ----------------
+y_pred = model.predict(X_test)
+
+# ---------------- Evaluate Model ----------------
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print("Mean Squared Error:", mse)
+print("R² Score:", r2)
+print("\nPredicted Sales:", y_pred)
+print("Actual Sales:", y_test.values)
+
+# ---------------- Plot Predicted vs Actual ----------------
+plt.figure(figsize=(6,4))
+sns.scatterplot(x=y_test, y=y_pred)
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')
+plt.xlabel("Actual Sales")
+plt.ylabel("Predicted Sales")
+plt.title("Future Sales Prediction: Actual vs Predicted")
+plt.show()
