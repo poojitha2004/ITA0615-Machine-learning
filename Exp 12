@@ -1,0 +1,47 @@
+# Import required libraries
+import numpy as np
+import pandas as pd
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# ---------------- Load Dataset ----------------
+iris = load_iris()
+X = iris.data       # Features: Sepal/ Petal length & width
+y = iris.target     # Classes: 0=setosa, 1=versicolor, 2=virginica
+
+# ---------------- Split Dataset ----------------
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+
+# ---------------- Create KNN Classifier ----------------
+k = 5  # Number of neighbors
+knn = KNeighborsClassifier(n_neighbors=k)
+
+# ---------------- Train Model ----------------
+knn.fit(X_train, y_train)
+
+# ---------------- Predict ----------------
+y_pred = knn.predict(X_test)
+
+# ---------------- Evaluation ----------------
+cm = confusion_matrix(y_test, y_pred)
+accuracy = accuracy_score(y_test, y_pred)
+
+print("Confusion Matrix:")
+print(cm)
+print("\nAccuracy:", accuracy)
+
+# ---------------- Plot Confusion Matrix ----------------
+plt.figure(figsize=(6,4))
+sns.heatmap(cm, annot=True, cmap='Greens', fmt='d',
+            xticklabels=iris.target_names,
+            yticklabels=iris.target_names)
+plt.xlabel("Predicted Label")
+plt.ylabel("True Label")
+plt.title("Iris Flower Classification - KNN")
+plt.show()
