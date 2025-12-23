@@ -1,0 +1,57 @@
+# Import required libraries
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix, accuracy_score
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# ---------------- Sample Dataset ----------------
+# Features: Age, Income, Credit_History (0=bad,1=good), Loan_Amount
+data = {
+    'Age': [25, 45, 39, 50, 23, 40, 36, 28, 48, 33],
+    'Income': [50000, 100000, 75000, 120000, 40000, 95000, 80000, 55000, 110000, 60000],
+    'Credit_History': [1, 1, 0, 1, 0, 1, 1, 0, 1, 0],
+    'Loan_Amount': [20000, 25000, 10000, 30000, 15000, 20000, 18000, 12000, 27000, 16000],
+    'Credit_Risk': ['Good', 'Good', 'Bad', 'Good', 'Bad', 'Good', 'Good', 'Bad', 'Good', 'Bad']
+}
+
+df = pd.DataFrame(data)
+
+# ---------------- Features & Target ----------------
+X = df[['Age', 'Income', 'Credit_History', 'Loan_Amount']]
+y = df['Credit_Risk']
+
+# ---------------- Split Dataset ----------------
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+
+# ---------------- Feature Scaling ----------------
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# ---------------- Logistic Regression Model ----------------
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# ---------------- Predictions ----------------
+y_pred = model.predict(X_test)
+
+# ---------------- Evaluation ----------------
+cm = confusion_matrix(y_test, y_pred)
+accuracy = accuracy_score(y_test, y_pred)
+
+print("Confusion Matrix:")
+print(cm)
+print("\nAccuracy:", accuracy)
+
+# ---------------- Plot Confusion Matrix ----------------
+plt.figure(figsize=(5,4))
+sns.heatmap(cm, annot=True, cmap="Blues", fmt='d', xticklabels=['Bad','Good'], yticklabels=['Bad','Good'])
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Credit Score Classification - Confusion Matrix")
+plt.show()
