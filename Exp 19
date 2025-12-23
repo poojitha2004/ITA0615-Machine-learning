@@ -1,0 +1,52 @@
+# Import required libraries
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import confusion_matrix, accuracy_score
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# ---------------- Sample Dataset ----------------
+# Features: Age, Income (in thousands), Credit_History (0=bad,1=good), Loan_Amount
+data = {
+    'Age': [25, 45, 39, 50, 23, 40, 36, 28, 48, 33],
+    'Income': [50, 100, 75, 120, 40, 95, 80, 55, 110, 60],  # in 1000s
+    'Credit_History': [1, 1, 0, 1, 0, 1, 1, 0, 1, 0],
+    'Loan_Amount': [200, 250, 100, 300, 150, 200, 180, 120, 270, 160],
+    'Loan_Status': ['Yes', 'Yes', 'No', 'Yes', 'No', 'Yes', 'Yes', 'No', 'Yes', 'No']
+}
+
+df = pd.DataFrame(data)
+
+# ---------------- Features & Target ----------------
+X = df[['Age', 'Income', 'Credit_History', 'Loan_Amount']]
+y = df['Loan_Status']
+
+# ---------------- Split Dataset ----------------
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+
+# ---------------- Create Naive Bayes Classifier ----------------
+nb = GaussianNB()
+
+# ---------------- Train Model ----------------
+nb.fit(X_train, y_train)
+
+# ---------------- Predict ----------------
+y_pred = nb.predict(X_test)
+
+# ---------------- Evaluate Model ----------------
+accuracy = accuracy_score(y_test, y_pred)
+cm = confusion_matrix(y_test, y_pred)
+
+print("Accuracy:", accuracy)
+print("\nConfusion Matrix:\n", cm)
+
+# ---------------- Plot Confusion Matrix ----------------
+plt.figure(figsize=(5,4))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['No','Yes'], yticklabels=['No','Yes'])
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Bank Loan Prediction - Naive Bayes")
+plt.show()
