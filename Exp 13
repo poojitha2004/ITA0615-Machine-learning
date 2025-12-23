@@ -1,0 +1,53 @@
+# Import required libraries
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# ---------------- Sample Dataset ----------------
+# Features: Year, Mileage (in km), Engine (in CC)
+data = {
+    'Year': [2015, 2012, 2018, 2016, 2014, 2019, 2017, 2013, 2020, 2011],
+    'Mileage': [50000, 80000, 30000, 40000, 60000, 20000, 35000, 90000, 10000, 120000],
+    'Engine': [1200, 1500, 1000, 1300, 1400, 1000, 1200, 1600, 1000, 1500],
+    'Price': [500000, 350000, 700000, 550000, 400000, 800000, 600000, 300000, 900000, 250000]
+}
+
+df = pd.DataFrame(data)
+
+# ---------------- Features & Target ----------------
+X = df[['Year', 'Mileage', 'Engine']]
+y = df['Price']
+
+# ---------------- Split Dataset ----------------
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+
+# ---------------- Create Linear Regression Model ----------------
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# ---------------- Predict ----------------
+y_pred = model.predict(X_test)
+
+# ---------------- Evaluate Model ----------------
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print("Mean Squared Error:", mse)
+print("R² Score:", r2)
+print("\nPredicted Prices:", y_pred)
+print("Actual Prices:", y_test.values)
+
+# ---------------- Plot Predicted vs Actual ----------------
+plt.figure(figsize=(6,4))
+sns.scatterplot(x=y_test, y=y_pred)
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')  # Perfect prediction line
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title("Car Price Prediction: Actual vs Predicted")
+plt.show()
