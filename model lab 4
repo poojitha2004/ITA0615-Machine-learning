@@ -1,0 +1,54 @@
+# Import required libraries
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.mixture import GaussianMixture
+
+# -----------------------------
+# Inbuilt Example Dataset
+# -----------------------------
+# Let's create a dataset with two clusters
+np.random.seed(42)
+
+# Cluster 1: centered at 5
+cluster1 = np.random.normal(5, 1, 100)
+# Cluster 2: centered at 10
+cluster2 = np.random.normal(10, 1.5, 100)
+
+# Combine the clusters
+X = np.concatenate([cluster1, cluster2]).reshape(-1, 1)
+
+# -----------------------------
+# Visualize the Data
+# -----------------------------
+plt.figure(figsize=(8,5))
+plt.hist(X, bins=30, color='skyblue', edgecolor='black')
+plt.title("Histogram of Data")
+plt.xlabel("Value")
+plt.ylabel("Frequency")
+plt.show()
+
+# -----------------------------
+# EM Algorithm using GMM
+# -----------------------------
+# Fit Gaussian Mixture Model with 2 components
+gmm = GaussianMixture(n_components=2, random_state=42)
+gmm.fit(X)
+
+# Get predicted cluster labels
+labels = gmm.predict(X)
+
+# -----------------------------
+# Output: Means and Covariances
+# -----------------------------
+print("Means of the Gaussian components:", gmm.means_.flatten())
+print("Covariances of the Gaussian components:", gmm.covariances_.flatten())
+print("Weights of the Gaussian components:", gmm.weights_.flatten())
+
+# -----------------------------
+# Visualize the clusters
+# -----------------------------
+plt.figure(figsize=(8,5))
+plt.scatter(X, np.zeros_like(X), c=labels, cmap='viridis', s=50)
+plt.title("EM Algorithm Clustering (GMM)")
+plt.xlabel("Value")
+plt.show()
